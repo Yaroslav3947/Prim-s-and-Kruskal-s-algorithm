@@ -9,10 +9,6 @@ struct Edge {
     Edge(int from, int to, int weight) : from(from), to(to), weight(weight) {}
 };
 
-bool compareEdges(const Edge &a, const Edge &b) {
-    return a.weight < b.weight;
-}
-
 int getLeader(int x, std::vector<int> &leader) {
     if (x < 0 || x >= leader.size()) return -1;  // check limits
 
@@ -40,21 +36,23 @@ bool unite(int x, int y, std::vector<int> &leader) {
 }
 
 std::vector<Edge> kruskal(std::vector<Edge> &edges,const int &numVertices) {
-    std::sort(edges.begin(), edges.end(), compareEdges);
+    std::sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) {
+    return a.weight < b.weight;}
+    );
 
     std::vector<int> leader(numVertices);
     for (int i = 0; i < numVertices; i++)
         leader[i] = i;
 
-    std::vector<Edge> edges;
+    std::vector<Edge> mstEdges;
     for (const auto& edge : edges) {
         int from = edge.from, to = edge.to;
 
         if (unite(from, to, leader))
-            edges.push_back(edge);
+            mstEdges.push_back(edge);
     }
 
-    return edges;
+    return mstEdges;
 }
 
 int getTotalWeight(const std::vector<Edge> &edges) {
@@ -91,9 +89,10 @@ int main() {
         edge.from--;
         edge.to--;
     }
-    std::vector<Edge> edges = kruskal(edges, numVertices);
 
-    printEdges(edges, getTotalWeight(edges));
+    std::vector<Edge> minimumSpanningTree = kruskal(edges, numVertices);
+
+    printEdges(minimumSpanningTree, getTotalWeight(minimumSpanningTree));
 
     return 0;
 }
